@@ -52,7 +52,6 @@ def getPercentages(predictions):
             emotionCountMap["Sad"] += 1
         elif prediction == 'Surprised':    
             emotionCountMap["Surprised"] += 1
-#Round it up to 2 decimal places
     percentages = {
         'Angry': round((emotionCountMap["Angry"] / len(predictions) * 100), 2),
         'Disgusted': round((emotionCountMap["Disgusted"] / len(predictions) * 100), 2),
