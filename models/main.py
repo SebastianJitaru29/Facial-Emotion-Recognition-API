@@ -24,19 +24,65 @@ def predict_emotion(model, img):
     pred = model.predict(img)
     return pred
 
-def main(predictions):
+def getPercentages(predictions):
+
+    percentages = []
+    emotionCountMap = {
+        'Angry': 0,
+        'Disgusted': 0,
+        'Fearful': 0,
+        'Happy': 0,
+        'Neutral': 0,
+        'Sad': 0,
+        'Surprised': 0
+    }
+
+    for prediction in predictions:
+        if prediction == 'Angry':
+            emotionCountMap["Angry"] += 1
+        elif prediction == 'Disgusted':
+            emotionCountMap["Disgusted"] += 1
+        elif prediction == 'Fearful':
+            emotionCountMap["Fearful"] += 1
+        elif prediction == 'Happy':
+            emotionCountMap["Happy"] += 1
+        elif prediction == 'Neutral':
+            emotionCountMap["Neutral"] += 1
+        elif prediction == 'Sad':
+            emotionCountMap["Sad"] += 1
+        elif prediction == 'Surprised':    
+            emotionCountMap["Surprised"] += 1
+#Round it up to 2 decimal places
+    percentages = {
+        'Angry': round((emotionCountMap["Angry"] / len(predictions) * 100), 2),
+        'Disgusted': round((emotionCountMap["Disgusted"] / len(predictions) * 100), 2),
+        'Fearful': round((emotionCountMap["Fearful"] / len(predictions) * 100), 2),
+        'Happy': round((emotionCountMap["Happy"] / len(predictions) * 100), 2),
+        'Neutral': round((emotionCountMap["Neutral"] / len(predictions) * 100), 2),
+        'Sad': round((emotionCountMap["Sad"] / len(predictions) * 100), 2),
+        'Surprised': round((emotionCountMap["Surprised"] / len(predictions) * 100), 2)
+        
+    }
+    print(emotionCountMap)
+    print(percentages)
+
+
+def main(video_path, predictions):
     model = load_model()
     face_cascade = load_face_cascade()
 
-    # Open camera
-    webcam = cv2.VideoCapture(0)
+    # Open video file
+    video = cv2.VideoCapture(video_path)
 
     # Define emotion labels
+    labels = {0: 'Angry', 1: 'Disgusted', 2: 'Fearful', 3: 'Happy', 4: 'Neutral', 5: 'Sad', 6: 'Surprised'}
 
-    labels = {0:'Angry',1:'Disgusted',2:'Fearful',3:'Happy',4:'Neutral',5:'Sad',6:'Surprised'}
     while True:
-        # Read a frame from webcam
-        i, im = webcam.read()
+        # Read a frame from video
+        ret, im = video.read()
+        if not ret:
+            break
+
         # Convert the frame to gray color
         gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
 
@@ -70,54 +116,14 @@ def main(predictions):
         except cv2.error:
             pass
 
-    # Release the webcam
-    webcam.release()
+    # Release the video
+    video.release()
     # Close the window
     cv2.destroyAllWindows()
-def getPercentages(predictions):
 
-    percentages = []
-    emotionCountMap = {
-        'Angry': 0,
-        'Disgusted': 0,
-        'Fearful': 0,
-        'Happy': 0,
-        'Neutral': 0,
-        'Sad': 0,
-        'Surprised': 0
-    }
-
-    for prediction in predictions:
-        if prediction == 'Angry':
-            emotionCountMap["Angry"] += 1
-        elif prediction == 'Disgusted':
-            emotionCountMap["Disgust"] += 1
-        elif prediction == 'Fearful':
-            emotionCountMap["Fearful"] += 1
-        elif prediction == 'Happy':
-            emotionCountMap["Happy"] += 1
-        elif prediction == 'Neutral':
-            emotionCountMap["Neutral"] += 1
-        elif prediction == 'Sad':
-            emotionCountMap["Sad"] += 1
-        elif prediction == 'Surprised':    
-            emotionCountMap["Surprised"] += 1
-#Round it up to 2 decimal places
-    percentages = {
-        'Angry': round((emotionCountMap["Angry"] / len(predictions) * 100), 2),
-        'Disgusted': round((emotionCountMap["Disgusted"] / len(predictions) * 100), 2),
-        'Fearful': round((emotionCountMap["Fearful"] / len(predictions) * 100), 2),
-        'Happy': round((emotionCountMap["Happy"] / len(predictions) * 100), 2),
-        'Neutral': round((emotionCountMap["Neutral"] / len(predictions) * 100), 2),
-        'Sad': round((emotionCountMap["Sad"] / len(predictions) * 100), 2),
-        'Surprised': round((emotionCountMap["Surprised"] / len(predictions) * 100), 2)
-        
-    }
-    print(emotionCountMap)
-    print(percentages)
 
 if __name__ == "__main__":
     predictions = []
-    main(predictions)
+    main("my_face_video.mp4",predictions)
     print(predictions)
     getPercentages(predictions)
