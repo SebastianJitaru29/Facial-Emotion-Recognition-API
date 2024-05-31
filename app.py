@@ -1,42 +1,10 @@
-from flask import Flask, request
-from PIL import Image
-import numpy as np
-import tensorflow as tf
+from services.emotion_analysis.emotion_analysis_imp import EmotionsAnalysisImp
 
-app = Flask(__name__)
+def main():
+    emotion_analysis_service = EmotionsAnalysisImp(model_path="models/model2/model2.h5")
+    video_path = "static/videos/my_face_video.mp4"  # Path to the video you want to analyze
+    result = emotion_analysis_service.get_emotion_percentages(video_path)
+    print(result)
 
-# Load the model
-model = tf.keras.models.load_model("emotiondetector_h5/emotiondetector.h5")
-
-# Define emotion labels
-emotion_labels = ["Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise", "Neutral"]
-
-@app.route('/predict_emotion', methods=['POST'])
-def predict_emotion():
-    # Receive image
-    file = request.files['image']
-    
-    # Read image
-    img = Image.open(file).convert("L")  # Open in black and white
-    img = img.resize((48, 48))  # Resize image to desired size
-
-    # Convert image to array and normalize
-    img_array = np.array(img) / 255.0
-
-    # Expand dimensions to match the input shape expected by the model
-    img_array = np.expand_dims(img_array, axis=0)
-
-    # Make prediction
-    predictions = model.predict(img_array)
-
-    # Get the index of the highest probability
-    predicted_class_index = np.argmax(predictions[0])
-
-    # Get the predicted emotion
-    predicted_emotion = emotion_labels[predicted_class_index]
-
-    # Return predicted emotion
-    return predicted_emotion
-
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    main()

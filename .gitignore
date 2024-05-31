@@ -1,5 +1,8 @@
-# Ignore .mp4 files
-*.mp4
-
 # Ignore files starting with "model"
 models*/
+
+### Python ###
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class

@@ -70,7 +70,7 @@ def main(video_path, predictions):
     model = load_model()
     face_cascade = load_face_cascade()
 
-    # Open video file
+    # pass in video_path or 0 for webcam
     video = cv2.VideoCapture(video_path)
 
     # Define emotion labels
