@@ -22,7 +22,7 @@ class EmotionsAnalysisImp(EmotionsAnalysisService):
             predictions = []
             labels = {0: 'Angry', 1: 'Disgusted', 2: 'Fearful', 3: 'Happy', 4: 'Neutral', 5: 'Sad', 6: 'Surprised'}
             # Load the video with path or 0 for webcam
-            video = cv2.VideoCapture(0)
+            video = cv2.VideoCapture(video_path)
             while True:
                 ret, im = video.read()
                 if not ret:
@@ -47,5 +47,4 @@ class EmotionsAnalysisImp(EmotionsAnalysisService):
             video.release()
             cv2.destroyAllWindows()
             percentages = getPercentages(predictions)
-            print(percentages)
             return GetEmotionPercentagesResponse(Angry=percentages['Angry'], Disgusted=percentages['Disgusted'], Fearful=percentages['Fearful'], Happy=percentages['Happy'], Neutral=percentages['Neutral'], Sad=percentages['Sad'], Surprised=percentages['Surprised'])
