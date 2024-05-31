@@ -21,7 +21,8 @@ class EmotionsAnalysisImp(EmotionsAnalysisService):
             """
             predictions = []
             labels = {0: 'Angry', 1: 'Disgusted', 2: 'Fearful', 3: 'Happy', 4: 'Neutral', 5: 'Sad', 6: 'Surprised'}
-            video = cv2.VideoCapture(video_path)
+            # Load the video with path or 0 for webcam
+            video = cv2.VideoCapture(0)
             while True:
                 ret, im = video.read()
                 if not ret:
