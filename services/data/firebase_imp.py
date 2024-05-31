@@ -17,7 +17,7 @@ class FirebaseService:
 
     def download_video_from_storage(self, video_name):
         blob = self.storage_client.blob(video_name)
-        video_path = f"/videos/{video_name}"
+        video_path = f"{video_name}"
         blob.download_to_filename(video_path)
         return video_path
 
