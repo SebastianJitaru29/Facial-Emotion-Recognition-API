@@ -6,5 +6,11 @@ models*/
 __pycache__/
 *.py[cod]
 *$py.class
+venv/
+firebase/*.json
 
-firebase/
+# Other files and directories to ignore
+node_modules/
+.DS_Store
+.env
+.idea/

@@ -24,8 +24,7 @@ class FirebaseImp(FirebaseService):
         firebase_admin.initialize_app(cred, {'storageBucket': self.storage_bucket})
         self.storage_client = storage.bucket()
 
-    def download_video_from_storage(self):
-        video_name = "FB.mp4"
+    def download_video_from_storage(self,video_name):
         self.logger.info(f"Attempting to download video: {video_name} from storage.")
         blob = self.storage_client.blob(video_name)
         video_path = f"static/videos/{video_name}"
