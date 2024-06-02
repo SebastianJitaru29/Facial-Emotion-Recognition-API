@@ -57,7 +57,7 @@ def call_hello_world():
     logger.info("Attempting to call test firebase function.")
     firebase_funcion_url = "https://europe-west1-backend-testing-tfg.cloudfunctions.net/hello_world"
     try: 
-        response = requests.get(firebase_funcion_url) #Allows to call the firebase function hosted elswhere
+        response = requests.get(firebase_funcion_url) #Allows to call the firebase function hosted elswhere, available methods: get, post, put, delete
         if response.status_code == 200:
             return jsonify(response.json()), 200
         else:
