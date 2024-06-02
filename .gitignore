@@ -6,9 +6,8 @@ models*/
 __pycache__/
 *.py[cod]
 *$py.class
+venv/
 firebase/*.json
-# Ignore the venv directory in firebase/functions
-firebase/functions/venv/
 
 # Other files and directories to ignore
 node_modules/
