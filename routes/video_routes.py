@@ -2,6 +2,8 @@ from flask import Blueprint, request, jsonify
 import logging
 from services.data.firebase_imp import FirebaseImp
 from services.emotion_analysis.emotion_analysis_imp import EmotionsAnalysisImp
+import requests
+
 video_routes = Blueprint("video_routes", __name__)
 
 # Initialize Firebase service
@@ -46,5 +48,20 @@ def process_video():
     if not video_name:
         return jsonify({"error": "Video name is missing in the request"}), 400
     # Process the video
+
     download_and_analyze_video(video_name)
     return jsonify({"message": "Video processing initiated"}), 200
+
+@video_routes.route("/test", methods=["GET"])
+def call_hello_world():
+    logger.info("Attempting to call test firebase function.")
+    firebase_funcion_url = "https://europe-west1-backend-testing-tfg.cloudfunctions.net/hello_world"
+    try: 
+        response = requests.get(firebase_funcion_url) #Allows to call the firebase function hosted elswhere
+        if response.status_code == 200:
+            return jsonify(response.json()), 200
+        else:
+            return jsonify({"error": "Failed to call firebase function"}), response.status_code
+    except Exception as e:
+        logger.error(f"Failed to call firebase function: {e}")
+        return jsonify({"error": "Failed to call firebase function"}), 500
