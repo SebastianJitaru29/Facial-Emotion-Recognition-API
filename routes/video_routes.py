@@ -2,9 +2,6 @@ from flask import Blueprint, request, jsonify
 import logging
 from services.data.firebase_imp import FirebaseImp
 from services.emotion_analysis.emotion_analysis_imp import EmotionsAnalysisImp
-from firebase.functions import main
-import requests
-import json
 video_routes = Blueprint("video_routes", __name__)
 
 # Initialize Firebase service
@@ -49,17 +46,5 @@ def process_video():
     if not video_name:
         return jsonify({"error": "Video name is missing in the request"}), 400
     # Process the video
-
     download_and_analyze_video(video_name)
-    data = requests.get("https://google.com")
-
-    response = main.demo_function(data)
-
-    response_data = json.loads(response)  # Parse the JSON string to a dictionary
-    word = response_data["word"]
-    number = response_data["number"]
-    print("Word:", word)
-    print("Number:", number)
-    print("demo function response:",response)
-
     return jsonify({"message": "Video processing initiated"}), 200
