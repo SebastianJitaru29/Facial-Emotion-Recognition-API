@@ -1,9 +1,9 @@
 from services.emotion_analysis.emotion_analysis_imp import EmotionsAnalysisImp
-from services.data.firebase_imp import FirebaseService
+from services.data.firebase_imp import FirebaseImp
 
 def main():
     # Initialize the FirebaseService
-    firebase_service = FirebaseService(firebase_cred_path="firebase/backend-testing-tfg-firebase-adminsdk-vx45t-0271916f87.json", storage_bucket="gs://backend-testing-tfg.appspot.com")
+    firebase_service = FirebaseImp(firebase_cred_path="firebase/backend-testing-tfg-firebase-adminsdk-vx45t-d0c10e29bd.json", storage_bucket="gs://backend-testing-tfg.appspot.com")
 
     # Perform emotion analysis on the video
     emotion_analysis_service = EmotionsAnalysisImp(model_path="models/model2/model2.h5")

@@ -2,8 +2,9 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 from firebase_admin import storage
+from services.data.firebase_service import FirebaseService
 
-class FirebaseService:
+class FirebaseImp(FirebaseService):
     def __init__(self, firebase_cred_path, storage_bucket):
         self.firebase_cred_path = firebase_cred_path
         self.storage_bucket = storage_bucket
@@ -22,6 +23,6 @@ class FirebaseService:
         return video_path
 
     def upload_to_firestore(self, data):
-        doc_ref = self.db.collection('VideoAnalysis').document()
+        doc_ref = self.db.collection('AnalysisVideo').document()
         doc_ref.set(data)
         return doc_ref.id
