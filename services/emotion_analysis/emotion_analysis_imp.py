@@ -1,6 +1,8 @@
 
 from schemas.emotion_schema import GetEmotionPercentagesResponse
 from services.emotion_analysis.emotion_analysis_service import EmotionsAnalysisService
+import logging
+import coloredlogs
 from utils.utils import load_model, load_face_cascade, extract_features, predict_emotion, getPercentages 
 import cv2
 
@@ -8,6 +10,8 @@ class EmotionsAnalysisImp(EmotionsAnalysisService):
     def __init__(self, model_path: str):
         self.model = load_model(model_path)
         self.face_cascade = load_face_cascade()
+        coloredlogs.install(level="INFO", fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        self.logger = logging.getLogger(__name__)
 
     def get_emotion_percentages(self, video_path: str) -> GetEmotionPercentagesResponse:
             """
@@ -22,7 +26,8 @@ class EmotionsAnalysisImp(EmotionsAnalysisService):
             predictions = []
             labels = {0: 'Angry', 1: 'Disgusted', 2: 'Fearful', 3: 'Happy', 4: 'Neutral', 5: 'Sad', 6: 'Surprised'}
             # Load the video with path or 0 for webcam
-            video = cv2.VideoCapture(0)
+            self.logger.info(f"Loading video from path: {video_path}")
+            video = cv2.VideoCapture(video_path)
             while True:
                 ret, im = video.read()
                 if not ret:
@@ -47,5 +52,5 @@ class EmotionsAnalysisImp(EmotionsAnalysisService):
             video.release()
             cv2.destroyAllWindows()
             percentages = getPercentages(predictions)
-            print(percentages)
+            self.logger.info(f"Percentages of emotions detected: {percentages}")
             return GetEmotionPercentagesResponse(Angry=percentages['Angry'], Disgusted=percentages['Disgusted'], Fearful=percentages['Fearful'], Happy=percentages['Happy'], Neutral=percentages['Neutral'], Sad=percentages['Sad'], Surprised=percentages['Surprised'])
