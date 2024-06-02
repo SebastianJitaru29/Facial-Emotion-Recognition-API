@@ -1,7 +1,7 @@
 # RuxaiLab Facial Emotion Detection API
 
 ## Overview
-This Flask API serves as the backend for the RuxaiLab Bachelor's thesis project, providing facial emotion detection capabilities. It processes video input, detects emotions displayed on faces within the video frames, and integrates with Firebase for user authentication and storage.
+This Flask API serves as the backend for the RuxaiLab Bachelor's thesis project, providing facial emotion detection capabilities. It processes video input, detects emotions displayed on faces within the video frames.
 
 ## Features
 - **Video Processing:** Upload a video file to analyze emotions displayed on faces within the frames.
