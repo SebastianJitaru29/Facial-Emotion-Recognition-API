@@ -3,7 +3,7 @@ import logging
 from services.data.firebase_imp import FirebaseImp
 from services.emotion_analysis.emotion_analysis_imp import EmotionsAnalysisImp
 import requests
-
+from utils.utils import delete_video
 video_routes = Blueprint("video_routes", __name__)
 
 # Initialize Firebase service
@@ -50,7 +50,9 @@ def process_video():
     # Process the video
 
     download_and_analyze_video(video_name)
-    return jsonify({"message": "Video processing initiated"}), 200
+    logger.info("Deleting video from local storage.")
+    delete_video(video_name)
+    return jsonify({"message": "Video processing finalized"}), 200
 
 @video_routes.route("/test", methods=["GET"])
 def call_hello_world():

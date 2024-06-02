@@ -3,29 +3,68 @@ from keras.models import model_from_json
 import numpy as np
 import tensorflow as tf
 
+#This file is initial implementation as minimum viable product for emotion detection needed for the project agile development
 
 def load_model():
-    # Load the Haar cascade classifier for face detection from videos
+    """
+    Load the pre-trained emotion detection model.
+
+    Returns:
+        model (tf.keras.Model): The loaded emotion detection model.
+    """
     model = tf.keras.models.load_model("models/model2/model2.h5")
     return model
 
 def load_face_cascade():
+    """
+    Load the Haar cascade classifier for face detection.
+
+    Returns:
+        face_cascade (cv2.CascadeClassifier): The loaded Haar cascade classifier.
+    """
     haar_file = cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
     face_cascade = cv2.CascadeClassifier(haar_file)
     return face_cascade
 
 def extract_features(image):
+    """
+    Extract features from the input image.
+
+    Args:
+        image (numpy.ndarray): The input image.
+
+    Returns:
+        feature (numpy.ndarray): The extracted features.
+    """
     feature = np.array(image)
     feature = feature.reshape(1, 48, 48, 1)
     feature = feature / 255.0
     return feature
 
 def predict_emotion(model, img):
+    """
+    Predict the emotion from the input image.
+
+    Args:
+        model (tf.keras.Model): The emotion detection model.
+        img (numpy.ndarray): The input image.
+
+    Returns:
+        pred (numpy.ndarray): The predicted emotion probabilities.
+    """
     pred = model.predict(img)
     return pred
 
 def getPercentages(predictions):
+    """
+    Calculate the percentage distribution of each emotion in the predictions.
 
+    Args:
+        predictions (list): The list of predicted emotions.
+
+    Returns:
+        percentages (dict): The percentage distribution of each emotion.
+    """
     percentages = []
     emotionCountMap = {
         'Angry': 0,
@@ -65,8 +104,14 @@ def getPercentages(predictions):
     print(emotionCountMap)
     print(percentages)
 
-
 def main(video_path, predictions):
+    """
+    Perform emotion detection on a video or webcam feed.
+
+    Args:
+        video_path (str): The path to the video file or 0 for webcam feed.
+        predictions (list): The list to store the predicted emotions.
+    """
     model = load_model()
     face_cascade = load_face_cascade()
 
