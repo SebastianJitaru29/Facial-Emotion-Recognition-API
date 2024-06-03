@@ -7,8 +7,8 @@ from utils.utils import delete_video
 video_routes = Blueprint("video_routes", __name__)
 
 # Initialize Firebase service
-firebase_cred_path = "firebase/backend-testing-tfg-firebase-adminsdk-vx45t-d0c10e29bd.json"
-storage_bucket = "backend-testing-tfg.appspot.com"
+firebase_cred_path = "firebase/backend-tfg-1d0d5-firebase-adminsdk-y3qei-5579c77082.json"
+storage_bucket = "backend-tfg-1d0d5.appspot.com"
 firebase_service = FirebaseImp(firebase_cred_path=firebase_cred_path, storage_bucket=storage_bucket)
 
 logger = logging.getLogger(__name__)
@@ -57,7 +57,7 @@ def process_video():
 @video_routes.route("/test", methods=["GET"])
 def call_hello_world():
     logger.info("Attempting to call test firebase function.")
-    firebase_funcion_url = "https://europe-west1-backend-testing-tfg.cloudfunctions.net/hello_world"
+    firebase_funcion_url = "https://europe-west1-backend-tfg-1d0d5.cloudfunctions.net/hello_world"
     try: 
         response = requests.get(firebase_funcion_url) #Allows to call the firebase function hosted elswhere, available methods: get, post, put, delete
         if response.status_code == 200:

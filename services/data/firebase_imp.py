@@ -33,6 +33,6 @@ class FirebaseImp(FirebaseService):
         return video_path
 
     def upload_to_firestore(self, data):
-        doc_ref = self.db.collection('VideosAnalysis').document()
+        doc_ref = self.db.collection('VideoAnalysis').document()
         doc_ref.set(data)
         return doc_ref.id
