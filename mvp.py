@@ -116,7 +116,7 @@ def main(video_path, predictions):
     face_cascade = load_face_cascade()
 
     # pass in video_path or 0 for webcam
-    video = cv2.VideoCapture(video_path)
+    video = cv2.VideoCapture(0)
 
     # Define emotion labels
     labels = {0: 'Angry', 1: 'Disgusted', 2: 'Fearful', 3: 'Happy', 4: 'Neutral', 5: 'Sad', 6: 'Surprised'}
