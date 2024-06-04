@@ -1,6 +1,6 @@
 import cv2
 
-def record_video(filename='output.mp4', duration=10):
+def record_video(filename, duration):
     # Open the default camera
     cap = cv2.VideoCapture(0)
 
@@ -20,7 +20,7 @@ def record_video(filename='output.mp4', duration=10):
         cv2.imshow('frame', frame)
 
         # Break the loop if the duration exceeds
-        if (cv2.getTickCount() - start_time) / cv2.getTickFrequency() > duration-2.25:
+        if (cv2.getTickCount() - start_time) / cv2.getTickFrequency() > duration:
             break
 
         # Break the loop if 'q' is pressed
@@ -33,4 +33,4 @@ def record_video(filename='output.mp4', duration=10):
     cv2.destroyAllWindows()
 
 # Usage
-record_video('my_face_video1.mp4', 10)
+record_video('my_face_video2min.mp4', 120)

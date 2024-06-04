@@ -4,6 +4,7 @@ from services.data.firebase_imp import FirebaseImp
 from services.emotion_analysis.emotion_analysis_imp import EmotionsAnalysisImp
 import requests
 from utils.utils import delete_video
+from utils.utils import split_video_into_clips
 video_routes = Blueprint("video_routes", __name__)
 
 # Initialize Firebase service
@@ -22,23 +23,33 @@ def download_and_analyze_video(video_name):
     except Exception as e:
         logger.error(f"Failed to download video: {e}")
         return
-
-    # Perform emotion analysis on the downloaded video
+    
+    # Perform emotion analysis on the split video clips
     logger.info("Initializing emotion analysis.")
     emotion_analysis_service = EmotionsAnalysisImp(model_path="models/model2/model2.h5")
+
+    video_paths = split_video_into_clips(video_path)
+    for video_path in video_paths:
+        result_dict =analyze_video_clip(video_path, emotion_analysis_service)
+        try:
+            doc_id = firebase_service.upload_to_firestore(result_dict)
+            logger.info(f"Analysis results uploaded successfully. Document ID: {doc_id}")
+        except Exception as e:
+            logger.error(f"Failed to upload analysis results to Firestore: {e}")
+    # Upload the analysis results to Firestore
+    logger.info("Uploading analysis results to Firestore.")
+    #Upload all results at the same time to Firestore
+    
+
+def analyze_video_clip(video_path, emotion_analysis_service):
     try:
         result = emotion_analysis_service.get_emotion_percentages(video_path)
         logger.info(f"Emotion analysis result: {result}")
     except Exception as e:
         logger.error(f"Failed to analyze video: {e}")
         return
-    result_dict = result if isinstance(result, dict) else result.__dict__    # Upload the analysis results to Firestore
-    logger.info("Uploading analysis results to Firestore.")
-    try:
-        doc_id = firebase_service.upload_to_firestore(result_dict)
-        logger.info(f"Analysis results uploaded successfully. Document ID: {doc_id}")
-    except Exception as e:
-        logger.error(f"Failed to upload analysis results to Firestore: {e}")
+    result_dict = result if isinstance(result, dict) else result.__dict__
+    return result_dict
 
 
 @video_routes.route("/process_video", methods=["POST"])
@@ -51,13 +62,15 @@ def process_video():
 
     download_and_analyze_video(video_name)
     logger.info("Deleting video from local storage.")
-    delete_video(video_name)
+    delete_video()
     return jsonify({"message": "Video processing finalized"}), 200
 
 @video_routes.route("/test", methods=["GET"])
 def call_hello_world():
     logger.info("Attempting to call test firebase function.")
-    firebase_funcion_url = "https://europe-west1-backend-tfg-1d0d5.cloudfunctions.net/hello_world"
+    #using emulators http://127.0.0.1:5001/backend-tfg-1d0d5/europe-west1/hello_world
+    #Without emulators https://europe-west1-backend-tfg-1d0d5.cloudfunctions.net/hello_world
+    firebase_funcion_url = "http://127.0.0.1:5001/backend-tfg-1d0d5/europe-west1/hello_world" 
     try: 
         response = requests.get(firebase_funcion_url) #Allows to call the firebase function hosted elswhere, available methods: get, post, put, delete
         if response.status_code == 200:

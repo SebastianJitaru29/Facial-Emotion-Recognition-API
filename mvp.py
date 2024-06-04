@@ -104,6 +104,20 @@ def getPercentages(predictions):
     print(emotionCountMap)
     print(percentages)
 
+def split_video(video_path):
+    cap = cv2.VideoCapture("../static/videos/FB.mp4")
+
+    #Get length of video
+
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    duration = frame_count/fps
+    minutes = int(duration/60)
+    seconds = duration%60
+    
+    #Split the video into 60 second clips
+    
+
 def main(video_path, predictions):
     """
     Perform emotion detection on a video or webcam feed.
@@ -120,10 +134,11 @@ def main(video_path, predictions):
 
     # Define emotion labels
     labels = {0: 'Angry', 1: 'Disgusted', 2: 'Fearful', 3: 'Happy', 4: 'Neutral', 5: 'Sad', 6: 'Surprised'}
-
+    counter = 0
     while True:
         # Read a frame from video
         ret, im = video.read()
+        counter += 1
         if not ret:
             break
 
@@ -154,6 +169,7 @@ def main(video_path, predictions):
             # Display the frame
             cv2.imshow('Emotion Detector', im)
             # Break the loop if 'q' is pressed
+            print(counter)
             if cv2.waitKey(1) == 27:
                 break
 
