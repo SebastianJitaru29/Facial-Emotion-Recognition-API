@@ -29,13 +29,16 @@ def download_and_analyze_video(video_name):
     emotion_analysis_service = EmotionsAnalysisImp(model_path="models/model2/model2.h5")
 
     video_paths = split_video_into_clips(video_path)
+    results = []
     for video_path in video_paths:
         result_dict =analyze_video_clip(video_path, emotion_analysis_service)
-        try:
-            doc_id = firebase_service.upload_to_firestore(result_dict)
-            logger.info(f"Analysis results uploaded successfully. Document ID: {doc_id}")
-        except Exception as e:
-            logger.error(f"Failed to upload analysis results to Firestore: {e}")
+        results.append(result_dict)
+    # Upload the analysis results to Firestore
+    try:
+        doc_id = firebase_service.upload_to_firestore(results)
+        logger.info(f"Analysis results uploaded successfully. Document ID: {doc_id}")
+    except Exception as e:
+        logger.error(f"Failed to upload analysis results to Firestore: {e}")
     # Upload the analysis results to Firestore
     logger.info("Uploading analysis results to Firestore.")
     #Upload all results at the same time to Firestore
@@ -50,7 +53,6 @@ def analyze_video_clip(video_path, emotion_analysis_service):
         return
     result_dict = result if isinstance(result, dict) else result.__dict__
     return result_dict
-
 
 @video_routes.route("/process_video", methods=["POST"])
 def process_video():

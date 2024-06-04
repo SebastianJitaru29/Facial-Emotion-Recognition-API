@@ -34,5 +34,6 @@ class FirebaseImp(FirebaseService):
 
     def upload_to_firestore(self, data):
         doc_ref = self.db.collection('VideoAnalysis').document()
-        doc_ref.set(data)
+        formatted_data = {f"fragment{idx + 1}": result_dict for idx, result_dict in enumerate(data)}
+        doc_ref.set(formatted_data)
         return doc_ref.id
