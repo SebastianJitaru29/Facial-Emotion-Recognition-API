@@ -5,6 +5,7 @@ from services.emotion_analysis.emotion_analysis_imp import EmotionsAnalysisImp
 import requests
 from utils.utils import delete_video
 from utils.utils import split_video_into_clips
+from time import sleep
 video_routes = Blueprint("video_routes", __name__)
 
 # Initialize Firebase service
@@ -27,27 +28,29 @@ def download_and_analyze_video(video_name):
     # Perform emotion analysis on the split video clips
     logger.info("Initializing emotion analysis.")
     emotion_analysis_service = EmotionsAnalysisImp(model_path="models/model2/model2.h5")
-    try:
-        results = emotion_analysis_service.get_emotion_percentages(video_path)
-        logger.info(f"Emotion analysis result: {results}")
-    except Exception as e:
-        logger.error(f"Failed to analyze video: {e}")
-        return
-    result_dict = results if isinstance(results, dict) else results.__dict__
-    results = []
-    results.append(result_dict)
-    #video_paths = split_video_into_clips(video_path)
+    # try:
+    #     results = emotion_analysis_service.get_emotion_percentages(video_path)
+    #     logger.info(f"Emotion analysis result: {results}")
+    # except Exception as e:
+    #     logger.error(f"Failed to analyze video: {e}")
+    #     return
+    # result_dict = results if isinstance(results, dict) else results.__dict__
     # results = []
-    # for video_path in video_paths:
-    #     logger.info(f"Analyzing video: {video_path}")
-    #     try:
-    #         result = emotion_analysis_service.get_emotion_percentages(video_path)
-    #         logger.info(f"Emotion analysis result: {result}")
-    #     except Exception as e:
-    #         logger.error(f"Failed to analyze video: {e}")
-    #         return
-    #     result_dict = result if isinstance(result, dict) else result.__dict__
-    #     results.append(result_dict)
+    # results.append(result_dict)
+    logger.info(f"----------Splitting video into clips: {video_path}")
+    video_paths = split_video_into_clips(video_path)
+    logger.info(f"Split video clips: {video_paths}")
+    results = []
+    for video_path in video_paths:
+        logger.info(f"Analyzing video: {video_path}")
+        try:
+            result = emotion_analysis_service.get_emotion_percentages(video_path)
+            logger.info(f"Emotion analysis result: {result}")
+        except Exception as e:
+            logger.error(f"Failed to analyze video: {e}")
+            return
+        result_dict = result if isinstance(result, dict) else result.__dict__
+        results.append(result_dict)
     # Upload the analysis results to Firestore
     try:
         doc_id = firebase_service.upload_to_firestore(results)

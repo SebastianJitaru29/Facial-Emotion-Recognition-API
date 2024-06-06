@@ -30,6 +30,13 @@ class EmotionsAnalysisImp(EmotionsAnalysisService):
         # Check if the file exists and is accessible
         if not os.path.exists(video_path):
             self.logger.error(f"Video file does not exist: {video_path}")
+            directory = os.path.dirname(video_path)
+            if os.path.exists(directory):
+                self.logger.info(f"Contents of the directory {directory}:")
+                for item in os.listdir(directory):
+                    self.logger.info(f" - {item}")
+            else:
+                self.logger.error(f"Directory does not exist: {directory}")
             return GetEmotionPercentagesResponse(Angry=0, Disgusted=0, Fearful=0, Happy=0, Neutral=0, Sad=0, Surprised=0)
 
         video = cv2.VideoCapture(video_path)
