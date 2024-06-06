@@ -14,20 +14,11 @@ class EmotionsAnalysisImp(EmotionsAnalysisService):
         self.logger = logging.getLogger(__name__)
 
     def get_emotion_percentages(self, video_path: str) -> GetEmotionPercentagesResponse:
-        """
-        Calculates the percentages of different emotions detected in a video.
-
-        Args:
-            video_path (str): The path to the video file.
-
-        Returns:
-            GetEmotionPercentagesResponse: An object containing the percentages of each emotion detected.
-        """
         predictions = []
         labels = {0: 'Angry', 1: 'Disgusted', 2: 'Fearful', 3: 'Happy', 4: 'Neutral', 5: 'Sad', 6: 'Surprised'}
         self.logger.info(f"Loading video from path: {video_path}")
 
-        # Check if the file exists and is accessible
+        # Check if the file exists 
         if not os.path.exists(video_path):
             self.logger.error(f"Video file does not exist: {video_path}")
             directory = os.path.dirname(video_path)
