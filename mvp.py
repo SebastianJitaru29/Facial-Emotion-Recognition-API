@@ -102,21 +102,7 @@ def getPercentages(predictions):
         
     }
     print(emotionCountMap)
-    print(percentages)
-
-def split_video(video_path):
-    cap = cv2.VideoCapture("../static/videos/FB.mp4")
-
-    #Get length of video
-
-    fps = cap.get(cv2.CAP_PROP_FPS)
-    frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    duration = frame_count/fps
-    minutes = int(duration/60)
-    seconds = duration%60
-    
-    #Split the video into 60 second clips
-    
+    print(percentages)    
 
 def main(video_path, predictions):
     """
@@ -130,7 +116,7 @@ def main(video_path, predictions):
     face_cascade = load_face_cascade()
 
     # pass in video_path or 0 for webcam
-    video = cv2.VideoCapture(0)
+    video = cv2.VideoCapture(video_path)
 
     # Define emotion labels
     labels = {0: 'Angry', 1: 'Disgusted', 2: 'Fearful', 3: 'Happy', 4: 'Neutral', 5: 'Sad', 6: 'Surprised'}
@@ -184,6 +170,6 @@ def main(video_path, predictions):
 
 if __name__ == "__main__":
     predictions = []
-    main("static/videos/my_face_video.mp4",predictions)
+    main("static/videos/face_video.mp4",predictions)
     print(predictions)
     getPercentages(predictions)

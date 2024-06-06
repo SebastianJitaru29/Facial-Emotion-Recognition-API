@@ -1,9 +1,9 @@
-
+import os
 from schemas.emotion_schema import GetEmotionPercentagesResponse
 from services.emotion_analysis.emotion_analysis_service import EmotionsAnalysisService
 import logging
 import coloredlogs
-from utils.utils import load_model, load_face_cascade, extract_features, predict_emotion, getPercentages 
+from utils.utils import load_model, load_face_cascade, extract_features, predict_emotion, getPercentages
 import cv2
 
 class EmotionsAnalysisImp(EmotionsAnalysisService):
@@ -14,43 +14,60 @@ class EmotionsAnalysisImp(EmotionsAnalysisService):
         self.logger = logging.getLogger(__name__)
 
     def get_emotion_percentages(self, video_path: str) -> GetEmotionPercentagesResponse:
-            """
-            Calculates the percentages of different emotions detected in a video.
+        """
+        Calculates the percentages of different emotions detected in a video.
 
-            Args:
-                video_path (str): The path to the video file.
+        Args:
+            video_path (str): The path to the video file.
 
-            Returns:
-                GetEmotionPercentagesResponse: An object containing the percentages of each emotion detected.
-            """
-            predictions = []
-            labels = {0: 'Angry', 1: 'Disgusted', 2: 'Fearful', 3: 'Happy', 4: 'Neutral', 5: 'Sad', 6: 'Surprised'}
-            # Load the video with path or 0 for webcam
-            self.logger.info(f"Loading video from path: {video_path}")
-            video = cv2.VideoCapture(video_path)
-            while True:
-                ret, im = video.read()
-                if not ret:
-                    break
-                gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
-                faces = self.face_cascade.detectMultiScale(im, 1.3, 5)
-                try:
-                    for (p, q, r, s) in faces:
-                        image = gray[q:q + s, p:p + r]
-                        cv2.rectangle(im, (p, q), (p + r, q + s), (255, 0, 0), 2)
-                        image = cv2.resize(image, (48, 48))
-                        img = extract_features(image)
-                        pred = predict_emotion(self.model, img)
-                        prediction_label = labels[pred.argmax()]
-                        predictions.append(prediction_label)
-                        cv2.putText(im, prediction_label, (p, q - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (36, 255, 12), 2)
-                    cv2.imshow('Emotion Detector', im)
-                    if cv2.waitKey(1) == 27:
-                        break
-                except cv2.error:
-                    pass
-            video.release()
-            cv2.destroyAllWindows()
-            percentages = getPercentages(predictions)
-            self.logger.info(f"Percentages of emotions detected: {percentages}")
-            return GetEmotionPercentagesResponse(Angry=percentages['Angry'], Disgusted=percentages['Disgusted'], Fearful=percentages['Fearful'], Happy=percentages['Happy'], Neutral=percentages['Neutral'], Sad=percentages['Sad'], Surprised=percentages['Surprised'])
+        Returns:
+            GetEmotionPercentagesResponse: An object containing the percentages of each emotion detected.
+        """
+        predictions = []
+        labels = {0: 'Angry', 1: 'Disgusted', 2: 'Fearful', 3: 'Happy', 4: 'Neutral', 5: 'Sad', 6: 'Surprised'}
+        self.logger.info(f"Loading video from path: {video_path}")
+
+        # Check if the file exists and is accessible
+        if not os.path.exists(video_path):
+            self.logger.error(f"Video file does not exist: {video_path}")
+            return GetEmotionPercentagesResponse(Angry=0, Disgusted=0, Fearful=0, Happy=0, Neutral=0, Sad=0, Surprised=0)
+
+        video = cv2.VideoCapture(video_path)
+        if not video.isOpened():
+            self.logger.error(f"Failed to open video file: {video_path}")
+            return GetEmotionPercentagesResponse(Angry=0, Disgusted=0, Fearful=0, Happy=0, Neutral=0, Sad=0, Surprised=0)
+
+        frame_count = 0
+        face_count = 0
+        while True:
+            ret, im = video.read()
+            if not ret:
+                break
+            frame_count += 1
+            gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+            faces = self.face_cascade.detectMultiScale(gray, 1.3, 5)
+            #self.logger.info(f"Frame {frame_count}: Detected {len(faces)} faces")
+            try:
+                for (p, q, r, s) in faces:
+                    face_count += 1
+                    image = gray[q:q + s, p:p + r]
+                    image = cv2.resize(image, (48, 48))
+                    img = extract_features(image)
+                    pred = predict_emotion(self.model, img)
+                    prediction_label = labels[pred.argmax()]
+                    predictions.append(prediction_label)
+            except cv2.error as e:
+                self.logger.error(f"OpenCV error: {e}")
+                pass
+
+        video.release()
+
+        self.logger.info(f"Total frames processed: {frame_count}")
+        self.logger.info(f"Total faces detected: {face_count}")
+
+        if not predictions:
+            self.logger.warning("No faces detected or no predictions made.")
+
+        percentages = getPercentages(predictions)
+        self.logger.info(f"Percentages of emotions detected: {percentages}")
+        return GetEmotionPercentagesResponse(Angry=percentages['Angry'], Disgusted=percentages['Disgusted'], Fearful=percentages['Fearful'], Happy=percentages['Happy'], Neutral=percentages['Neutral'], Sad=percentages['Sad'], Surprised=percentages['Surprised'])

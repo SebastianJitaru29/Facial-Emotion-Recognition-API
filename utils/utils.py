@@ -57,9 +57,9 @@ def split_video_into_clips(video_path):
     #Split video into clips of 10 seconds
     for i in range(0, int(seconds), 10):
         starttime = i
-        endtime = i+10 
+        endtime = i+15 
         targetname = str(i)+".mp4"
-        video_paths.append('../static/videos/'+targetname)
+        video_paths.append('../../static/videos/'+targetname)
         ffmpeg_extract_subclip(video_path, starttime, endtime, targetname=targetname)
         #move the video to the clips folder
         print(f"Moving {targetname} to clips folder")
