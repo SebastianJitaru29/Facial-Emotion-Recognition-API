@@ -2,10 +2,9 @@ from flask import Blueprint, request, jsonify
 import logging
 from services.data.firebase_imp import FirebaseImp
 from services.emotion_analysis.emotion_analysis_imp import EmotionsAnalysisImp
-import requests
-from utils.utils import delete_video
-from utils.utils import split_video_into_clips
-from time import sleep
+from utils.utils import delete_video, split_video_into_clips
+import time
+
 video_routes = Blueprint("video_routes", __name__)
 
 # Initialize Firebase service
@@ -14,6 +13,17 @@ storage_bucket = "backend-tfg-1d0d5.appspot.com"
 firebase_service = FirebaseImp(firebase_cred_path=firebase_cred_path, storage_bucket=storage_bucket)
 
 logger = logging.getLogger(__name__)
+
+def analyze_clip(emotion_analysis_service, video_path):
+    logger.info(f"Analyzing video: {video_path}")
+    try:
+        result = emotion_analysis_service.get_emotion_percentages(video_path)
+        logger.info(f"Emotion analysis result: {result}")
+        result_dict = result if isinstance(result, dict) else result.__dict__
+        return result_dict
+    except Exception as e:
+        logger.error(f"Failed to analyze video: {e}")
+        return None
 
 def download_and_analyze_video(video_name):
     # Download the video from Firebase Storage
@@ -25,66 +35,64 @@ def download_and_analyze_video(video_name):
         logger.error(f"Failed to download video: {e}")
         return
     
-    # Perform emotion analysis on the split video clips
-    logger.info("Initializing emotion analysis.")
-    emotion_analysis_service = EmotionsAnalysisImp(model_path="models/model2/model2.h5")
-    # try:
-    #     results = emotion_analysis_service.get_emotion_percentages(video_path)
-    #     logger.info(f"Emotion analysis result: {results}")
-    # except Exception as e:
-    #     logger.error(f"Failed to analyze video: {e}")
-    #     return
-    # result_dict = results if isinstance(results, dict) else results.__dict__
-    # results = []
-    # results.append(result_dict)
-    logger.info(f"----------Splitting video into clips: {video_path}")
+    # Split video into clips
+    logger.info(f"Splitting video into clips: {video_path}")
     video_paths = split_video_into_clips(video_path)
     logger.info(f"Split video clips: {video_paths}")
+
+    logger.info("Initializing emotion analysis.")
+    emotion_analysis_service = EmotionsAnalysisImp(model_path="models/model2/model2.h5")
     results = []
+
+    # Process the video clips sequentially
+    start_analysis = time.time()
     for video_path in video_paths:
-        logger.info(f"Analyzing video: {video_path}")
-        try:
-            result = emotion_analysis_service.get_emotion_percentages(video_path)
-            logger.info(f"Emotion analysis result: {result}")
-        except Exception as e:
-            logger.error(f"Failed to analyze video: {e}")
-            return
-        result_dict = result if isinstance(result, dict) else result.__dict__
-        results.append(result_dict)
+        result = analyze_clip(emotion_analysis_service, video_path)
+        if result:
+            results.append(result)
+    end_analysis = time.time()
+    logger.info(f"Time taken for analysis: {end_analysis - start_analysis} seconds")
+
     # Upload the analysis results to Firestore
     try:
         doc_id = firebase_service.upload_to_firestore(results)
         logger.info(f"Analysis results uploaded successfully. Document ID: {doc_id}")
     except Exception as e:
         logger.error(f"Failed to upload analysis results to Firestore: {e}")
-    # Upload the analysis results to Firestore
-    logger.info("Uploading analysis results to Firestore.")
-    #Upload all results at the same time to Firestore
 
 @video_routes.route("/process_video", methods=["POST"])
 def process_video():
+    # Start timer
+    start = time.time()
+    
     # Assuming the request contains the name of the video to process
     video_name = request.json.get("video_name")
     if not video_name:
         return jsonify({"error": "Video name is missing in the request"}), 400
+    
     # Process the video
-
     download_and_analyze_video(video_name)
+    
     logger.info("Deleting video from local storage.")
-    #delete_video()
+    delete_video()
+    
+    # End timer
+    end = time.time()
+    logger.info(f"Time taken to process video: {end - start} seconds")
     return jsonify({"message": "Video processing finalized"}), 200
 
 @video_routes.route("/test", methods=["GET"])
 def call_hello_world():
     logger.info("Attempting to call test firebase function.")
-    #using emulators http://127.0.0.1:5001/backend-tfg-1d0d5/europe-west1/hello_world
-    #Without emulators https://europe-west1-backend-tfg-1d0d5.cloudfunctions.net/hello_world
-    firebase_funcion_url = "http://127.0.0.1:5001/backend-tfg-1d0d5/europe-west1/hello_world" 
+    # Using emulators: http://127.0.0.1:5001/backend-tfg-1d0d5/europe-west1/hello_world
+    # Without emulators: https://europe-west1-backend-tfg-1d0d5.cloudfunctions.net/hello_world
+    firebase_function_url = "http://127.0.0.1:5001/backend-tfg-1d0d5/europe-west1/hello_world"
     try: 
-        response = requests.get(firebase_funcion_url) #Allows to call the firebase function hosted elswhere, available methods: get, post, put, delete
+        response = requests.get(firebase_function_url)  # Allows calling the firebase function hosted elsewhere, available methods: get, post, put, delete
         if response.status_code == 200:
             return jsonify(response.json()), 200
         else:
+            logger.error(f"Failed to call firebase function: {response.text}")
             return jsonify({"error": "Failed to call firebase function"}), response.status_code
     except Exception as e:
         logger.error(f"Failed to call firebase function: {e}")
