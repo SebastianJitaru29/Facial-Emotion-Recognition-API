@@ -86,9 +86,9 @@ def call_hello_world():
     logger.info("Attempting to call test firebase function.")
     # Using emulators: http://127.0.0.1:5001/backend-tfg-1d0d5/europe-west1/hello_world
     # Without emulators: https://europe-west1-backend-tfg-1d0d5.cloudfunctions.net/hello_world
-    firebase_function_url = "http://127.0.0.1:5001/backend-tfg-1d0d5/europe-west1/hello_world"
+    firebase_function_url = "https://europe-west1-backend-tfg-1d0d5.cloudfunctions.net/hello_world"
     try: 
-        response = requests.get(firebase_function_url)  # Allows calling the firebase function hosted elsewhere, available methods: get, post, put, delete
+        response = request.get(firebase_function_url)  # Allows calling the firebase function hosted elsewhere, available methods: get, post, put, delete
         if response.status_code == 200:
             return jsonify(response.json()), 200
         else:
@@ -97,3 +97,8 @@ def call_hello_world():
     except Exception as e:
         logger.error(f"Failed to call firebase function: {e}")
         return jsonify({"error": "Failed to call firebase function"}), 500
+
+# Endpoint that returns hello for testing 
+@video_routes.route("/hello", methods=["GET"])
+def hello_world():
+    return jsonify({"message": "Hello World!"}), 200
