@@ -6,7 +6,7 @@
 - [x] Implemented cliping video feature
 - [ ] Adding notebook to the github repo
 # Deploy
-- [ ] Dockerize backend
-- [ ] Deploy backend on cloud run
+- [x] Dockerize backend
+- [x] Deploy backend on cloud run
 
       
