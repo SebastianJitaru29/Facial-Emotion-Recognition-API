@@ -26,6 +26,9 @@ firebase-functions = "^0.4.1"
 coloredlogs = "^15.0.1"
 requests = "^2.32.3"
 moviepy = "^1.0.3"
+python-dotenv = "^1.0.1"
+flask-cors = "^4.0.1"
+gunicorn = "^22.0.0"
 
 
 [build-system]
