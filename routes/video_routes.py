@@ -54,11 +54,13 @@ def download_and_analyze_video(video_name):
     logger.info(f"Time taken for analysis: {end_analysis - start_analysis} seconds")
 
     # Upload the analysis results to Firestore
+    doc_id = 0
     try:
         doc_id = firebase_service.upload_to_firestore(results)
         logger.info(f"Analysis results uploaded successfully. Document ID: {doc_id}")
     except Exception as e:
         logger.error(f"Failed to upload analysis results to Firestore: {e}")
+    return doc_id
 
 @video_routes.route("/process_video", methods=["POST"])
 def process_video():
@@ -71,7 +73,7 @@ def process_video():
         return jsonify({"error": "Video name is missing in the request"}), 400
     
     # Process the video
-    download_and_analyze_video(video_name)
+    doc_id= download_and_analyze_video(video_name)
     
     logger.info("Deleting video from local storage.")
     delete_video()
@@ -79,8 +81,10 @@ def process_video():
     # End timer
     end = time.time()
     logger.info(f"Time taken to process video: {end - start} seconds")
-    return jsonify({"message": "Video processing finalized"}), 200
-
+    
+    #return a message indicating the video was processed and the document ID
+    return jsonify({"message": "Video processed successfully", "doc_id": doc_id}), 200
+    
 @video_routes.route("/test", methods=["GET"])
 def call_hello_world():
     logger.info("Attempting to call test firebase function.")
