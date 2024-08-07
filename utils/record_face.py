@@ -25,4 +25,4 @@ def record_video(filename, duration):
     cv2.destroyAllWindows()
 
 # Usage
-record_video('my_face_video2min.mp4', 30)
+record_video('my_face_video2min.mp4', 5)

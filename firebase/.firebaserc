@@ -1,9 +1,0 @@
-{
-  "projects": {
-    "default": "backend-tfg-1d0d5",
-    "backend-tfg": "backend-tfg-1d0d5"
-  },
-  "targets": {},
-  "etags": {},
-  "dataconnectEmulatorConfig": {}
-}
