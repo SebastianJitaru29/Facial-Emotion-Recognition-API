@@ -8,8 +8,8 @@ import time
 video_routes = Blueprint("video_routes", __name__)
 
 # Initialize Firebase service
-firebase_cred_path = "firebase/backend-tfg-1d0d5-firebase-adminsdk-y3qei-5579c77082.json"
-storage_bucket = "backend-tfg-1d0d5.appspot.com"
+firebase_cred_path = "service-account.json"
+storage_bucket = "retlab-dev.appspot.com"
 firebase_service = FirebaseImp(firebase_cred_path=firebase_cred_path, storage_bucket=storage_bucket)
 
 logger = logging.getLogger(__name__)

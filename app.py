@@ -19,5 +19,5 @@ if __name__ == "__main__":
     coloredlogs.install(level="INFO", fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     logger = logging.getLogger(__name__)
     logger.info("Starting the application on: http://localhost:5000/")
-    #app.run(host="localhost", port=5000) # Run locally
-    app.run(host="0.0.0.0", port=8080) # Run on Google Cloud Run
+    app.run(host="localhost", port=5000) # Run locally
+    #app.run(host="0.0.0.0", port=8080) # Run on Google Cloud Run
